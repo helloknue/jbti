@@ -98,7 +98,10 @@ p{margin:0 0 10px}
 .tag{font-size:18px;margin:0}
 .emoji{font-size:52px;line-height:1}
 .chipsnav{display:flex;gap:6px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
-.chipsnav a{flex:none;font-size:13px;text-decoration:none;color:var(--ink);background:var(--sheet);border:1.5px solid var(--rule);border-radius:999px;padding:5px 12px}
+.chipsnav a,.chipsnav button{flex:none;font-size:13px;text-decoration:none;color:var(--ink);background:var(--sheet);border:1.5px solid var(--rule);border-radius:999px;padding:5px 12px;font-family:inherit;cursor:pointer}
+.gate input{width:100%;font-size:20px;letter-spacing:.3em;text-align:center;padding:12px;border:2px solid var(--rule);border-radius:12px;background:var(--sheet);color:var(--ink);box-sizing:border-box}
+.thub{display:grid;gap:10px}
+.thub button{text-align:left;width:100%}
 .quality{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .qbadge{font-size:13px;border-radius:999px;padding:4px 10px;background:var(--sheet2)}
 .qbadge.ok{color:var(--c2)}.qbadge.bad{color:var(--c1)}
@@ -455,7 +458,7 @@ const ABIL={
 /* ============ 게임 키트 데이터 ============ */
 /* 출발선 [이름, 부, 위신, 권력, 실력] */
 const START=[["가",8,1,1,0],["나",5,1,0,0],["다",3,0,0,0]];
-const START_N={가:4,나:7,다:4};
+const START_N={가:4,나:4,다:4};
 const EVENTS=[
  ["가족이 아파 병원비가 든다","부 −3"],
  ["집안의 도움","출발선 가: 부 +3 / 나: +1 / 다: 0"],
@@ -531,7 +534,7 @@ function approxAxes(code){ return AX.map((ax,i)=>{const p=code[i]===ax.a?72:28;r
 
 /* ============ 공통 조각 ============ */
 function bar(){
-  return `<div class="bar noprint"><button class="linkbtn" style="text-decoration:none;color:var(--ink);padding:0" data-go="home" aria-label="처음 화면"><span class="logo disp">${codeSpans("JBTI")}</span></button><div class="row" style="gap:2px"><button class="linkbtn" data-go="types">16유형</button>${S.get("jbti-result")?`<button class="linkbtn" data-go="result">내 결과</button>`:""}</div></div>`;
+  return `<div class="bar noprint"><button class="linkbtn" style="text-decoration:none;color:var(--ink);padding:0" data-go="home" aria-label="처음 화면"><span class="logo disp">${codeSpans("JBTI")}</span></button><div class="row" style="gap:2px">${TEACH.includes(parseRoute()[0])&&UNLOCK?`<button class="linkbtn" data-go="teacher">← 선생님용</button>`:""}<button class="linkbtn" data-go="types">16유형</button>${S.get("jbti-result")?`<button class="linkbtn" data-go="result">내 결과</button>`:""}</div></div>`;
 }
 function trackSVG(){
   const lanes=AX.map((ax,i)=>{const y=12+i*34;return `<rect x="0" y="${y}" width="360" height="30" rx="6" fill="${col(i)}" opacity=".13"/>
@@ -555,8 +558,7 @@ function home(){
   <div class="row" style="margin-top:14px"><button class="btn" data-go="test">${answered&&answered<Q.length?`이어서 하기 (${answered}/${Q.length})`:"검사 시작하기"}</button>
   ${last?`<button class="btn ghost" data-go="result">내 결과 다시 보기</button>`:""}</div></section>
   <ul class="axislist">${AX.map((a,i)=>`<li><span class="lane disp" style="background:${col(i)}">${i+1}</span><div><b>${a.t}</b> <span class="small muted">· ${a.f.join(" · ")}</span><br><span class="small"><b>${a.a}</b> = ${a.aw}(${a.an}): ${a.ad}<br><b>${a.b}</b> = ${a.bw}(${a.bn}): ${a.bd}</span></div></li>`).join("")}</ul>
-  <div class="teacher noprint"><h2>선생님용</h2>
-   <div class="row" style="gap:2px 14px"><button class="linkbtn" data-go="keycap">키캡 스티커 인쇄</button><button class="linkbtn" data-go="kit">게임 카드 인쇄</button><button class="linkbtn" data-go="board">게임 보드 인쇄(A3)</button><button class="linkbtn" data-go="sheet">종이 검사지</button><button class="linkbtn" data-go="about">검사 설계 근거</button></div></div>`;
+  <div class="teacher noprint" style="text-align:center"><button class="linkbtn" data-go="teacher">🔒 선생님용 페이지</button></div>`;
 }
 
 /* ============ 화면: 검사 ============ */
@@ -652,7 +654,7 @@ function heroHTML(code,label){
   <p class="muted small" style="margin:6px 0 0">${label}</p>
   <div style="display:flex;justify-content:space-between;align-items:flex-end"><div class="code disp">${codeSpans(code)}</div><span class="emoji" aria-hidden="true">${t[1]}</span></div>
   <h2 class="nick disp">${t[0]}</h2><p class="tag">${esc(t[2])}</p>%%QUALITY%%</section>
-  <nav class="chipsnav noprint" aria-label="결과 목차"><a href="#sec-axes">기준</a><a href="#sec-lens">렌즈</a><a href="#sec-map">사상가 지도</a><a href="#sec-read">해석</a><a href="#sec-friends">이웃</a><a href="#sec-play">밸런스 게임</a></nav>`;
+  <nav class="chipsnav noprint" aria-label="결과 목차"><button type="button" data-jump="sec-axes">기준</button><button type="button" data-jump="sec-lens">렌즈</button><button type="button" data-jump="sec-map">사상가 지도</button><button type="button" data-jump="sec-read">해석</button><button type="button" data-jump="sec-friends">이웃</button><button type="button" data-jump="sec-play">밸런스 게임</button></nav>`;
 }
 
 /* ============ 화면: 결과 ============ */
@@ -773,7 +775,7 @@ function kit(){
   KEYS.forEach(k=>cardsArr.push(kc(`능력 카드 · ${k}`,`${T[k][1]} ${ABIL[k][0]}`,esc(ABIL[k][1]),`${T[k][0]} · ${ABIL[k][2]}`,"#3D5BC4")));
   const pages=[];for(let i=0;i<cardsArr.length;i+=9)pages.push(cardsArr.slice(i,i+9));
   app.innerHTML=bar()+`<div class="noprint"><h2 class="disp" style="font-size:28px">게임 카드 인쇄</h2>
-  <p class="small">출발선 카드 15장(가 4·나 7·다 4), 직업 카드 15장(5종 × 3), 사건 카드 16장, 규칙 요약 카드 3장, 능력 카드 16장(유형별 1장)이 A4 ${pages.length}쪽에 들어가요. 모둠 수만큼 사건 카드와 규칙 요약 카드를 더 인쇄하세요.</p>
+  <p class="small">출발선 카드 12장(가 4·나 4·다 4), 직업 카드 15장(5종 × 3), 사건 카드 16장, 규칙 요약 카드 3장, 능력 카드 16장(유형별 1장)이 A4 ${pages.length}쪽에 들어가요. 모둠 수만큼 사건 카드와 규칙 요약 카드를 더 인쇄하세요.</p>
   <div class="row" style="margin:8px 0 14px"><button class="btn" data-act="print">인쇄하기</button></div></div>
   <div class="sheet-preview">${pages.map((pg,i)=>`<div class="kitcards ${i?"pagebreak":""}" style="${i?"margin-top:6mm":""}">${pg.join("")}</div>`).join("")}</div>`;
 }
@@ -793,7 +795,7 @@ function board(){
     ${wrapSVG(d[1],x+cw/2,y+24,cw-4,3.6,dark?"#fff":"#1C2B39")}</g>`;
   }
   const lx=ox+cols*(cw+gp)+8;
-  const rules=["1. 4명이 출발선(가1·나2·다1)·능력 카드를 받는다", "2. 차례대로 굴려 이동(은행·진행자 교사가 진행)", "💰 부: 게임 돈 · ⭐ 위신: 존경", "🔨 권력: 1개 내면 주사위 ±1·카드 재뽑기", "📘 실력: 배움·자습으로. 점수엔 없음", "3. 권력 자리는 지나가도 도전 가능", "   회장 누구나 · 주민자치회장 위신·권력1↑", "   시의원 권력2↑, 주사위 5↑", "4. 진로 관문: 실력+주사위 5↑ → 진학", "   등록금 4 (실력 3↑이면 면제)", "5. 취업 관문: 열쇠가 맞는 직업 고르기", "   의사 진학+실력3 · 공무원 실력3", "   회사원 실력2+(진학 또는 위신1)", "   자영업 부 4 · 예술가 누구나", "   월급날 표시(💰) 칸은 지나가도 월급", "6. 결산: 부 + 위신×2 + 권력×2", "   세 자원 모두 높으면 지위 일관 +4", "7. 자녀 출발선 27↑가 · 18~26나 · 17↓다", "8. 물려주기: 부의 절반 · 권력3↑ → 권력+1", "9. 2세대는 20칸까지, 가문 점수 최고 승리"];
+  const rules=["1. 3명이 출발선(가1·나1·다1)·능력 카드를 받는다", "2. 차례대로 굴려 이동(은행·진행자 교사가 진행)", "💰 부: 게임 돈 · ⭐ 위신: 존경", "🔨 권력: 1개 내면 주사위 ±1·카드 재뽑기", "📘 실력: 배움·자습으로. 점수엔 없음", "3. 권력 자리는 지나가도 도전 가능", "   회장 누구나 · 주민자치회장 위신·권력1↑", "   시의원 권력2↑, 주사위 5↑", "4. 진로 관문: 실력+주사위 5↑ → 진학", "   등록금 4 (실력 3↑이면 면제)", "5. 취업 관문: 열쇠가 맞는 직업 고르기", "   의사 진학+실력3 · 공무원 실력3", "   회사원 실력2+(진학 또는 위신1)", "   자영업 부 4 · 예술가 누구나", "   월급날 표시(💰) 칸은 지나가도 월급", "6. 결산: 부 + 위신×2 + 권력×2", "   세 자원 모두 높으면 지위 일관 +4", "7. 자녀 출발선 27↑가 · 18~26나 · 17↓다", "8. 물려주기: 부의 절반 · 권력3↑ → 권력+1", "9. 2세대는 20칸까지, 가문 점수 최고 승리"];
   const legend=`<g font-size="3.6" fill="#1C2B39"><text x="${lx}" y="${oy+6}" font-family="Black Han Sans, sans-serif" font-size="8">게임 규칙</text>
    ${rules.map((r,i)=>`<text x="${lx}" y="${oy+16+i*6.2}" xml:space="preserve">${esc(r)}</text>`).join("")}
    ${Object.entries({l:"배움(→실력)",k:"자습(→실력)",e:"사건",m:"용돈·알바(→부)",g:"관문·심사",v:"선거(→권력)",p:"💰지나가면 월급",s:"기타"}).map(([k,v],i)=>`<rect x="${lx+(i%2)*44}" y="${oy+16+rules.length*6.2+4+Math.floor(i/2)*8}" width="5" height="5" fill="${CELLCOL[k]}" stroke="#1C2B39" stroke-width=".3"/><text x="${lx+(i%2)*44+7}" y="${oy+16+rules.length*6.2+8.2+Math.floor(i/2)*8}">${v}</text>`).join("")}</g>`;
@@ -832,6 +834,46 @@ function sheet(){
 }
 function setPage(sz){document.getElementById("pagestyle").textContent=`@page{size:${sz};margin:${sz.startsWith("A3")?"8mm":"10mm"}}`;}
 
+/* ============ 선생님용 페이지(비밀번호) ============ */
+const TEACH=["keycap","kit","board","sheet","about"];
+let UNLOCK=false, TNEXT="";
+try{UNLOCK=sessionStorage.getItem("jbti-teacher")==="ok";}catch(e){}
+const PWK={s:"72da588079562dc85d069ce53aef6d91",h:"2bcc1b10dce4072d0fe49501508beea6b759d6c136e3349e058d001b28dc2816",n:150000};
+const hexBuf=x=>new Uint8Array(x.match(/../g).map(v=>parseInt(v,16)));
+const bufHex=b=>Array.from(new Uint8Array(b)).map(v=>v.toString(16).padStart(2,"0")).join("");
+async function pwCheck(pw){
+  if(!(window.crypto&&crypto.subtle)) throw new Error("nocrypto");
+  const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveBits"]);
+  const bits=await crypto.subtle.deriveBits({name:"PBKDF2",hash:"SHA-256",salt:hexBuf(PWK.s),iterations:PWK.n},key,256);
+  return bufHex(bits)===PWK.h;
+}
+async function unlock(){
+  const inp=document.getElementById("tpw"), msg=document.getElementById("tmsg"); if(!inp) return;
+  msg.textContent="확인하는 중…";
+  let ok=false;
+  try{ ok=await pwCheck(inp.value.trim()); }catch(e){ msg.textContent="이 브라우저에서는 확인할 수 없어요. 최신 브라우저로 열어 주세요."; return; }
+  if(!ok){ msg.textContent="비밀번호가 맞지 않아요."; inp.value=""; inp.focus(); return; }
+  UNLOCK=true; try{sessionStorage.setItem("jbti-teacher","ok");}catch(e){}
+  const n=TNEXT; TNEXT=""; go(n||"teacher");
+}
+function teacher(){
+  setPage("A4");
+  if(!UNLOCK){
+    app.innerHTML=bar()+`<div class="panel gate" style="max-width:420px;margin:40px auto;text-align:center">
+     <h2 class="disp" style="font-size:26px;margin:0 0 6px">🔒 선생님용 페이지</h2>
+     <p class="small muted" style="margin:0 0 14px">수업을 진행하는 선생님만 들어갈 수 있어요. 비밀번호를 입력하세요.</p>
+     <input id="tpw" type="password" inputmode="numeric" autocomplete="off" aria-label="비밀번호">
+     <div style="margin-top:12px"><button class="btn" data-act="unlock">들어가기</button></div>
+     <p id="tmsg" class="small" role="status" aria-live="polite" style="margin:10px 0 0;color:var(--c1);min-height:1.4em"></p>
+     <div style="margin-top:6px"><button class="linkbtn" data-go="home">처음으로</button></div></div>`;
+    setTimeout(()=>{const i=document.getElementById("tpw"); if(i) i.focus();},50);
+    return;
+  }
+  const items=[["keycap","키캡 스티커 인쇄","학생 유형 코드를 넣어 키캡용 네 글자 스티커를 스티커 용지에 인쇄해요."],["kit","게임 카드 인쇄","출발선·직업·사건·능력·규칙 요약 카드를 A4로 인쇄해요."],["board","게임 보드 인쇄(A3)","대물림 인생게임 30칸 보드를 A3 가로로 인쇄해요."],["sheet","종이 검사지","기기가 없을 때 쓰는 종이 검사지와 채점표예요."],["about","검사 설계 근거","네 축의 구성 개념, 참고 이론, 채점 방식과 신뢰도 점검 방법이에요."]];
+  app.innerHTML=bar()+`<h2 class="disp" style="font-size:28px;margin-bottom:10px">선생님용 페이지</h2>
+   <div class="thub">${items.map(([k,n,dsc])=>`<button class="panel" data-go="${k}" style="margin:0;cursor:pointer;border:1.5px solid var(--rule)"><b style="font-size:17px">${n}</b><br><span class="small muted">${dsc}</span></button>`).join("")}</div>
+   <div class="row" style="margin-top:16px;justify-content:center"><button class="linkbtn" data-act="lock">잠그고 나가기</button></div>`;
+}
 /* ============ 라우팅 ============ */
 function parseRoute(){
   const h=location.hash.slice(1), qs=new URLSearchParams(location.search);
@@ -844,12 +886,14 @@ function render(){
   document.querySelectorAll(".overlay").forEach(o=>o.remove());
   const [v,arg]=parseRoute();
   if(v!=="board"&&v!=="kit"&&v!=="keycap"&&v!=="sheet") setPage("A4");
-  ({test,result,types,about,keycap,kit,board,sheet}[v]||(v==="type"?()=>typeView(arg):home))();
+  if(TEACH.includes(v)&&!UNLOCK){TNEXT=v; teacher(); return;}
+  ({test,result,types,about,keycap,kit,board,sheet,teacher}[v]||(v==="type"?()=>typeView(arg):home))();
 }
 window.addEventListener("hashchange",render);
 
 app.addEventListener("click",e=>{
   const b=e.target.closest("button"); if(!b) return;
+  if(b.dataset.jump){const el=document.getElementById(b.dataset.jump); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); return;}
   if(b.dataset.go){go(b.dataset.go);return;}
   if(b.dataset.type){go("type",b.dataset.type);return;}
   if(b.dataset.filt){TF=b.dataset.filt;types();return;}
@@ -882,11 +926,14 @@ app.addEventListener("click",e=>{
     else{ const r=score(state.answers); S.set("jbti-result",r); state=blank(); S.del("jbti-progress"); go("result"); }
   }
   if(act==="retake"){state=blank();S.del("jbti-progress");go("test");}
+  if(act==="unlock"){unlock();return;}
+  if(act==="lock"){UNLOCK=false; try{sessionStorage.removeItem("jbti-teacher");}catch(e){} go("home"); return;}
   if(act==="print") window.print();
   if(act==="saveimg") saveImage();
   if(act==="capsize"){KS=+document.getElementById("ks").value||14;KN=Math.max(1,Math.min(6,+document.getElementById("kn").value||1));KL=document.getElementById("kl").checked;KCODES=document.getElementById("kcodes").value;keycap();}
 });
 app.addEventListener("keydown",e=>{
+  if(e.target.id==="tpw"&&e.key==="Enter"){e.preventDefault(); unlock(); return;}
   const b=e.target.closest(".scale button"); if(!b) return;
   if(e.key==="ArrowRight"||e.key==="ArrowLeft"){e.preventDefault();const n=e.key==="ArrowRight"?b.nextElementSibling:b.previousElementSibling;if(n){n.focus();n.click();}}
 });
